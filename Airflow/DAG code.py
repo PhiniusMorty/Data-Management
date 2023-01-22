@@ -64,6 +64,7 @@ with DAG(
     schedule= '0 */1 * * *', #timedelta(days=1)
     catchup=False,
     tags=["example"],
+    max_active_runs = 1,
 ) as dag_id:
     # [END instantiate_dag]
 
