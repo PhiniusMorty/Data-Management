@@ -1,10 +1,14 @@
-/*{
+/*
+Problem Statement: How to identify Serializable Isolation violation error on tables due to transformation or query executuion in Redshift Datawarehouse?
+Example Issue:
+{
     "name": "error",
     "length": 110,
     "severity": "ERROR",
     "code": "XX000",
     "detail": "Serializable isolation violation on table - {}, transactions forming the cycle are: {} (pid:{})" }
 */
+--Solution:
 -- Will show the order of queries from all the transactions combined:
 
 Select btrim(text), xid, starttime 
