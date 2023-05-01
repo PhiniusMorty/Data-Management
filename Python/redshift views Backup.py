@@ -53,7 +53,6 @@ def redshiftViewBackup(**kwargs):
   schema_list = data[0].to_list()
   counter = 0
   
-  conn.close()
     
   for schema_name in schema_list:
     
@@ -68,6 +67,9 @@ def redshiftViewBackup(**kwargs):
         f.write(query)
       prinit(f"{read_view_name} uploaded to s3")
       counter = counter + 1
+
   print(f"{counter} views uploaded")
+ 
+  conn.close()
 
       
