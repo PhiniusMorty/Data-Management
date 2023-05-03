@@ -37,8 +37,7 @@ def mysqlConnect():
   cursor.execute(query)
   results = cursor.fetchall()
   df_export = pd.DataFrame(results, dtype = object)
-  _uploadToS3(bucket = kwargs['bucket'], csv_name = kwargs['csv_name'], file = df_export)
-  
+  return df_exports
  
     
     
