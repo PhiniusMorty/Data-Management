@@ -54,8 +54,7 @@ def redshiftViewBackup(**kwargs):
   counter = 0
   
     
-  for schema_name in schema_list:
-    
+  for schema_name in schema_list:    
     view_list = get_viewlist(schema_name)
     for view in view_list: 
       query = get_createScript(view)
@@ -69,7 +68,7 @@ def redshiftViewBackup(**kwargs):
       counter = counter + 1
 
   print(f"{counter} views uploaded")
- 
   conn.close()
+  return
 
       
