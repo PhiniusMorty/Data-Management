@@ -10,10 +10,12 @@ def _uploadToS3 (index = False, header = True, **kwargs):
   with s3.open(f"s3://{kwargs['bucket']}/{kwargs['csv_name']}", 'w') as f:
     kwargs['file'].to_csv(f, index = index, header = header)
     
+  return
+    
 def single_api_toS3(**kwargs):
-  #Upload the file
-  s3_client = boto3.client('s3')
   
+  #Upload the file
+  s3_client = boto3.client('s3')  
   try:
     response = s3_client.upload_file(
       kwargs['file_name'],
@@ -23,20 +25,21 @@ def single_api_toS3(**kwargs):
     print('File Uploaded!')
   except ClientError as e:
     print(logging.error(e))
+  return
     
 def multiple_to_s3(**kwargs):
-  #Upload the file
-  s3_client = boto3.client('s3')
   
+  #Upload the file
+  s3_client = boto3.client('s3')  
   for file in kwargs['file_name']:
     object_name = file.split('/')[-1]
-    print(object_name)
-    
+    print(object_name)    
     try:
       response = s3_client.upload_file(file, kwargs['bucket'], object_name)
       print('File uploaded!')      
     except ClientError as e:
       print(logging.error(e))
+    return
   
   
   
