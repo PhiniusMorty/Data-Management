@@ -92,6 +92,7 @@ def get_ratingTickets(**kwargs):
     print('No category defined')
 
   return
+
 '''
 #------------------------------Documentation------------
 To get customer statisfaction score.
@@ -129,12 +130,91 @@ def get_CSATscore(**kwargs):
     'Authorization': str((API_key, API_password))
   }
   response = requests.request("POST", url, headers = headers, data = payload)
-  report_id = response.json()
+  report_id_value = response.json()
   time.sleep(60)
   
+  #Get report download links
   try:
-    df = pd.DataFrame()
-    for link in links:
+    report_id = report_id_value['id']
+    report_url = 'URL' # Add report ID
+    report_payload = '# {Id: '+str(report_id)+', link:{rel: extracts, Href: /reports/raw/'+str(report_id)+'}'
+    report_response = requests.request("GET", report_url, headers = headers, data = report_payload)
+    raw_link = report_response.json()
+    report_link =  raw_link['links']
+    time.sleep(60)
+    
+    try:
+      df = pd.DataFrame()
+      
+      for link in report_link:
+        
+        if link['status'] == 'COMPLETED':
+          href = link['link']['href']
+          resp = urllib2.urlopen(href).read()
+          file = ZipFile(BytesIO(resp))
+          file_name = list(file.NameToInfo)[0]
+          
+          try:
+            df_metric = pd.read_csv(file.open(file_name))
+            df = pd.concat([df, df_metric])
+            print('DataFrame contains data!')
+          except pd.errors.EmptyDataError:
+            print('DataFrame is empty. Warning: Oops! ', sys.exc_info[0],' occured.')
+        
+        else:
+          print('1. Export failed for report!')
+        # Inner loop ends!
+      
+      #Save the downloaded data into csv. Add code accordingly
+    except:
+      print('2. Export failed for report!')
+      pass
+  except:
+    print('3. Export failed for report!')
+    pass
+  
+  return
+#End of Code for CSAT Score
+
+#get CS data from Freshdesk
+def get_Tickets_CSdata(**kwargs):
+  df = pd.DataFrame()
+  #Pagination
+  pg_number = 1
+  print('Get Tickets:')
+  #Check status
+  url = 'URL'
+  ticket_status = requests.get(url, auth = (API_key, API_password))
+  
+  if ticket_status.status_code == 200:
+    while (pg_number != 0 and pg_number < 250): 
+      url_tickets = 'URL' # Add time and page number
+      tickets = requests.get(url_tickets, auth = (API_key, API_password))
+      insights = json.loads(ticket.content)
+      header = tickets.headers
+      df = df.append(insights, ignore_index = True)
+      
+      #Next page if link is found:
+      try:
+        pg_number+=1
+      except Exception:
+        pg_number = 0
+        print('Last page loaded')
+      
+      pg_diff = pg_number - 1
+      if (pg_diff%40 == 0):
+        time.sleep(60)
+    # Add code below to clean the data
+  
+  else:
+    response = json.loads(tickets_status.content)
+    print(f'Failed to read tickets. Error: {response['errors']}.\n X-request-id:{response.headers['x-request-id']} \n Status Code: {str(response.status_code)}')
+      
+  return
+            
+          
+        
+        
       
   
 
